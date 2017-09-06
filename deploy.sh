@@ -14,12 +14,6 @@ cd DataServerDB
 ./db-dl.sh
 cd ..
 
-# Configure AttackMapServer, extract flags to the correct place
-echo "Configuring AttackMapServer..."
-cd AttackMapServer/static/
-unzip flags.zip
-cd ../..
-
 echo ""
 echo "Done configuring stuff!"
 echo "Don't forget to start the redis-server before starting DataServer.py, or AttackMapServer.py"

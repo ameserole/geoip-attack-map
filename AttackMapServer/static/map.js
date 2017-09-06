@@ -4,12 +4,12 @@
 // - AttackMapServer machine:
 //   - Internal IP: 127.0.0.1
 //   - External IP: 192.168.11.106
-var webSock = new WebSocket("ws:/127.0.0.1:8888/websocket"); // Internal
+var webSock = new WebSocket("wss:/127.0.0.1/websocket"); // Internal
 //var webSock = new WebSocket("ws:/192.168.1.100:8888/websocket"); // External
 
 // link map
 
-L.mapbox.accessToken = "pk.eyJ1IjoibW1heTYwMSIsImEiOiJjaWgyYWU3NWQweWx2d3ltMDl4eGk5eWY1In0.9YoOkALPP7zaoim34ZITxw";
+L.mapbox.accessToken = "pk.eyJ1IjoiYW1lc2Vyb2xlIiwiYSI6ImNqNzg3bjlnajFsc20zM254N2lyZnNybTMifQ.WEdY-TbhBIwgcCQKck_MFw";
 var map = L.mapbox.map("map", "mapbox.dark", {
 center: [0, 0], // lat, long
 zoom: 2
@@ -219,234 +219,6 @@ function addCircle(msg, srcLatLng) {
         }).addTo(circles);
     }
 
-function prependAttackRow(id, args) {
-    var tr = document.createElement('tr');
-    count = args.length;
-
-    for (var i = 0; i < count; i++) {
-        var td = document.createElement('td');
-        if (args[i] === args[2]) {
-        var path = 'flags/' + args[i] + '.png';
-        var img = document.createElement('img');
-        img.src = path;
-        td.appendChild(img);
-        tr.appendChild(td);
-        } else {
-        var textNode = document.createTextNode(args[i]);
-        td.appendChild(textNode);
-        tr.appendChild(td);
-        }
-    }
-
-    var element = document.getElementById(id);
-    var rowCount = element.rows.length;
-
-    // Only allow 50 rows
-    if (rowCount >= 50) {
-        element.deleteRow(rowCount -1);
-    }
-
-    element.insertBefore(tr, element.firstChild);
-}
-
-function prependTypeRow(id, args) {
-    var tr = document.createElement('tr');
-    count = args.length;
-
-    for (var i = 0; i < count; i++) {
-        var td = document.createElement('td');
-        var textNode = document.createTextNode(args[i]);
-        td.appendChild(textNode);
-        tr.appendChild(td);
-    }
-
-    var element = document.getElementById(id);
-    var rowCount = element.rows.length;
-
-    // Only allow 50 rows
-    if (rowCount >= 50) {
-        element.deleteRow(rowCount -1);
-    }
-
-    element.insertBefore(tr, element.firstChild);
-}
-
-function prependCVERow(id, args) {
-    var tr = document.createElement('tr');
-
-    //count = args.length;
-    count = 1;
-
-    for (var i = 0; i < count; i++) {
-        var td1 = document.createElement('td');
-        var td2 = document.createElement('td');
-        var td3 = document.createElement('td');
-        var td4 = document.createElement('td');
-
-        // Timestamp
-        var textNode2 = document.createTextNode(args[0]);
-        td1.appendChild(textNode2);
-        tr.appendChild(td1);
-
-        // Exploit
-        var textNode = document.createTextNode(args[1]);
-
-        var alink = document.createElement('a');
-        alink.setAttribute("href",args[1]);
-        alink.setAttribute("target","_blank")
-        alink.style.color = "white";
-        alink.appendChild(textNode);
-
-        td2.appendChild(alink);
-        tr.appendChild(td2);
-
-        // Flag
-        var path = 'flags/' + args[2] + '.png';
-        var img = document.createElement('img');
-        img.src = path;
-        td3.appendChild(img);
-        tr.appendChild(td3);
-
-        // IP
-        var textNode3 = document.createTextNode(args[3]);
-        td4.appendChild(textNode3);
-        tr.appendChild(td4);
-    }
-
-    var element = document.getElementById(id);
-    var rowCount = element.rows.length;
-
-    // Only allow 50 rows
-    if (rowCount >= 50) {
-        element.deleteRow(rowCount -1);
-    }
-
-    element.insertBefore(tr, element.firstChild);
-}
-
-
-function redrawCountIP(hashID, id, countList, codeDict) {
-    $(hashID).empty();
-    var element = document.getElementById(id);
-
-    // Sort ips greatest to least
-    // Create items array from dict
-    var items = Object.keys(countList[0]).map(function(key) {
-        return [key, countList[0][key]];
-    });
-    // Sort the array based on the second element
-    items.sort(function(first, second) {
-        return second[1] - first[1];
-    });
-    // Create new array with only the first 50 items
-    var sortedItems = items.slice(0, 50);
-    var itemsLength = sortedItems.length;
-
-    for (var i = 0; i < itemsLength; i++) {
-        tr = document.createElement('tr');
-        td1 = document.createElement('td');
-        td2 = document.createElement('td');
-        td3 = document.createElement('td');
-        var key = sortedItems[i][0];
-        value = sortedItems[i][1];
-        var keyNode = document.createTextNode(key);
-        var valueNode = document.createTextNode(value);
-        var path = 'flags/' + codeDict[key] + '.png';
-        var img = document.createElement('img');
-        img.src = path;
-        td1.appendChild(valueNode);
-        td2.appendChild(img);
-       
-        var alink = document.createElement('a');
-        alink.setAttribute("href","#");
-        alink.setAttribute("class","showInfo");
-        alink.style.color = "white";        
-        alink.appendChild(keyNode);
-
-        td3.appendChild(alink);
-        tr.appendChild(td1);
-        tr.appendChild(td2);
-        tr.appendChild(td3);
-        element.appendChild(tr);
-    }
-}
-
-function redrawCountIP2(hashID, id, countList, codeDict) {
-    $(hashID).empty();
-    var element = document.getElementById(id);
-
-    // Sort ips greatest to least
-    // Create items array from dict
-    var items = Object.keys(countList[0]).map(function(key) {
-        return [key, countList[0][key]];
-    });
-    // Sort the array based on the second element
-    items.sort(function(first, second) {
-        return second[1] - first[1];
-    });
-    // Create new array with only the first 50 items
-    var sortedItems = items.slice(0, 50);
-    var itemsLength = sortedItems.length;
-
-    for (var i = 0; i < itemsLength; i++) {
-        tr = document.createElement('tr');
-        td1 = document.createElement('td');
-        td2 = document.createElement('td');
-        td3 = document.createElement('td');
-        var key = sortedItems[i][0];
-        value = sortedItems[i][1];
-        var keyNode = document.createTextNode(key);
-        var valueNode = document.createTextNode(value);
-        var path = 'flags/' + codeDict[key] + '.png';
-        var img = document.createElement('img');
-        img.src = path;
-        td1.appendChild(valueNode);
-        td2.appendChild(img);
-
-        td3.appendChild(keyNode);
-        tr.appendChild(td1);
-        tr.appendChild(td2);
-        tr.appendChild(td3);
-        element.appendChild(tr);
-    }
-}
-
-function handleLegend(msg) {
-    var ipCountList = [msg.ips_tracked,
-               msg.iso_code];
-    var countryCountList = [msg.countries_tracked,
-                msg.iso_code];
-    var attackList = [msg.event_time,
-              msg.src_ip,
-              msg.iso_code,
-              msg.country,
-              msg.city,
-              msg.protocol];
-    redrawCountIP('#ip-tracking','ip-tracking', ipCountList, msg.ip_to_code);
-    redrawCountIP2('#country-tracking', 'country-tracking', countryCountList, msg.country_to_code);
-    prependAttackRow('attack-tracking', attackList);
-}
-
-function handleLegendType(msg) {
-    var attackType = [msg.type2];
-    var attackCve = [msg.event_time,
-             msg.type3,
-             msg.iso_code,
-             msg.src_ip,
-             //msg.country,
-             //msg.city,
-             //msg.protocol
-             ];
-
-    if (attackType != "___") {
-        prependTypeRow('attack-type', attackType);
-    }
-
-    if (attackCve[1] != "___"){                
-        prependCVERow('attack-cveresp', attackCve);
-    }
-}
-
 // WEBSOCKET STUFF
 
 webSock.onmessage = function (e) {
@@ -464,8 +236,6 @@ webSock.onmessage = function (e) {
             addCircle(msg, srcLatLng);
             handleParticle(msg, srcPoint);
             handleTraffic(msg, srcPoint, hqPoint, srcLatLng);
-            handleLegend(msg);
-            handleLegendType(msg)
             break;
         // Add support for other message types?
         }
@@ -474,20 +244,3 @@ webSock.onmessage = function (e) {
     }
 };
 
-$(document).on("click","#informIP #exit", function (e) {
-    $("#informIP").hide();      
-});
-
-$(document).on("click", '.container-fluid .showInfo', function(e) {
-    var iplink = $(this).text();
-    $("#informIP").show();
-    $("#informIP").html( "<a id='ip_only' href='"+iplink+"'></a><button id='exit'>X</button><h3>"+iplink+"</h3><br><ul><li><a target = '_blank' href='http://www.senderbase.org/lookup/?search_string="+iplink+"'><b><u color=white>Senderbase</a></li><li><a target='_blank' href='https://ers.trendmicro.com/reputations/index'>Trend Micro</a></li><li><a target='_blank' href='http://www.anti-abuse.org/multi-rbl-check-results/?host="+iplink+"'>Anti-abuse</a></li></ul><br><button id='blockIP' alt='"+iplink+"'>Block IP</button>   ");
-});
-
-
-$(document).on("click","#informIP #blockIP", function (e) {
-    var ip= $(this).attr('alt');
-    var ipBlocked = "ip_blocked:"+ip;
-    console.log("Sending message: "+ipBlocked);
-    webSock.send(ipBlocked);
-});

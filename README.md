@@ -18,6 +18,7 @@ This program relies entirely on syslog, and because all appliances format logs d
 4. Add headquarters latitude/longitude to hqLatLng variable in **index.html**
 5. Use syslog-gen.py, or syslog-gen.sh to simulate dummy traffic "out of the box."
 6. **IMPORTANT: Remember, this code will only run correctly in a production environment after personalizing the parsing functions. The default parsing function is only written to parse ./syslog-gen.sh traffic.**
+7. Make sure to add the appropriate ssl certificate paths to `AttackMapServer.py`
 
 ### Bugs, Feedback, and Questions
 If you find any errors or bugs, please let me know. Questions and feedback are also welcome, and can be sent to mcmay.web@gmail.com, or open an issue in this repository.
@@ -29,7 +30,7 @@ Tested on Ubuntu 16.04 LTS.
 * Clone the application:
 
   ```sh
-  git clone https://github.com/matthewclarkmay/geoip-attack-map.git
+  git clone https://github.com/ameserole/geoip-attack-map.git
   ```
 
 * Install system dependencies:
@@ -78,13 +79,16 @@ Tested on Ubuntu 16.04 LTS.
     ./syslog-gen.sh
     ```
 
-* Configure the Attack Map Server, extract the flags to the right place:
+* Configure the Attack Map Server with SSL Certs:
 
-  * Open a new terminal tab (Ctrl+Shift+T, on Ubuntu).
+  * Edit `ssl_options` in `AttackMapServer.py` to point to your certificates.
   
-    ```sh
-    cd AttackMapServer/
-    unzip static/flags.zip
+    ```python
+    ssl_options={
+        "certfile": "/path/to/domain.crt",
+        "keyfile": "/path/to/domain.key",
+    }
+    
     ``` 
  
 * Start the Attack Map Server:
@@ -95,19 +99,19 @@ Tested on Ubuntu 16.04 LTS.
  
 * Access the Attack Map Server from browser:
 
-    * [http://localhost:8888/](http://localhost:8888/) or [http://127.0.0.1:8888/](http://127.0.0.1:8888/)
+    * [https://localhost/](https://localhost) or [https://127.0.0.1](https://127.0.0.1)
   
     * To access via browser on another computer, use the external IP of the machine running the AttackMapServer.
     
      * Edit the IP Address in the file "/static/map.js" at "AttackMapServer" directory. From:
       
        ```javascript
-       var webSock = new WebSocket("ws:/127.0.0.1:8888/websocket");
+       var webSock = new WebSocket("wss:/127.0.0.1:8888/websocket");
        ```
      * To, for example: 
      
        ```javascript
-       var webSock = new WebSocket("ws:/192.168.1.100:8888/websocket");
+       var webSock = new WebSocket("wss:/192.168.1.100:8888/websocket");
        ```
      * Restart the Attack Map Server:
      
@@ -117,5 +121,5 @@ Tested on Ubuntu 16.04 LTS.
      * On the other computer, points the browser to:
      
        ```sh
-       http://192.168.1.100:8888/
+       https://192.168.1.100
        ```
